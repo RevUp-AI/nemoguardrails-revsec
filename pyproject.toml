@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nemoguardrails-revsec"
+dynamic = ["version"]
+description = "RevSec rails for NVIDIA NeMo Guardrails: your organization's AI policies on every request, reply, tool call and tool result, managed in one place, with a record of what every app did."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [
+    { name = "RevSec / RevUp AI LLC", email = "hello@revupai.com" },
+]
+keywords = ["nemoguardrails", "nemo-guardrails", "guardrails", "rails", "ai-agents", "ai-security", "tool-calls", "prompt-injection", "governance"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Security",
+]
+dependencies = [
+    # Request, tool-result and reply checks (revsec.checks, check_reply from 0.5.2), tool-call checks (revsec.tools)
+    # and registration (revsec.agent).
+    "revsec-sdk>=0.5.2,<0.6",
+    # Tool-call and tool-result rails (rails.tool_call / rails.tool_result): tested end to end on 0.25.
+    "nemoguardrails>=0.25,<1",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7", "pytest-asyncio>=0.23"]
+
+[project.urls]
+Source = "https://github.com/RevUp-AI/nemoguardrails-revsec"
+Issues = "https://github.com/RevUp-AI/nemoguardrails-revsec/issues"
+"Start a free trial" = "https://app.revsec.app/start?from=nemo-guardrails"
+
+[tool.setuptools.dynamic]
+version = { attr = "nemoguardrails_revsec._version.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["nemoguardrails_revsec*"]
+
+[tool.setuptools.package-data]
+nemoguardrails_revsec = ["rails/*.co", "rails/*.py"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

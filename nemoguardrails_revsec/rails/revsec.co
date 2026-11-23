@@ -1,0 +1,58 @@
+# RevSec rails for NVIDIA NeMo Guardrails (Colang 1.0).
+# Name them in config.yml: rails.input / output / tool_call / tool_result flows.
+# With enable_rails_exceptions, a stop is raised as a RevSecRailException event instead of a reply.
+
+define bot revsec stopped
+  "$revsec_reason"
+
+
+# INPUT RAILS
+
+define subflow revsec check input
+  $revsec = execute revsec_check_input
+
+  if not $revsec.allowed
+    $revsec_reason = $revsec.message
+    if $config.enable_rails_exceptions
+      create event RevSecRailException(message=$revsec_reason)
+    else
+      bot revsec stopped
+    stop
+
+
+# OUTPUT RAILS
+
+define subflow revsec check output
+  $revsec = execute revsec_check_output
+
+  if not $revsec.allowed
+    $revsec_reason = $revsec.message
+    if $config.enable_rails_exceptions
+      create event RevSecRailException(message=$revsec_reason)
+      stop
+    $bot_message = $revsec_reason
+
+
+# TOOL CALL RAILS (before the app runs a tool)
+
+define subflow revsec check tool calls
+  $revsec = execute revsec_check_tool_calls
+
+  if not $revsec.allowed
+    if len($revsec.tool_calls) == 0
+      $revsec_reason = $revsec.message
+      if $config.enable_rails_exceptions
+        create event RevSecRailException(message=$revsec_reason)
+      else
+        bot revsec stopped
+      stop
+    $tool_calls = $revsec.tool_calls
+
+
+# TOOL RESULT RAILS (before the model reads a tool's result)
+
+define subflow revsec check tool results
+  $revsec = execute revsec_check_tool_result
+
+  if not $revsec.allowed
+    $tool_message = $revsec.message

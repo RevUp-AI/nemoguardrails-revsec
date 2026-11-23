@@ -1,0 +1,3 @@
+recursive-include nemoguardrails_revsec/rails *.co *.py
+recursive-include tests *.py
+global-exclude __pycache__ *.py[cod]
